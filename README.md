@@ -89,8 +89,21 @@ other slot, regardless of starting state.
 
 End state: MicroSlate is active; CrossInk is in the other slot.
 
-> Updating later? Re-running the same two-flash sequence updates each app **in its own
-> slot** and preserves the other, leaving MicroSlate active.
+### Updating an app later — read this first
+
+The OEM SD recovery **always writes the inactive slot**. That has a trap: if you've
+switched to app *X* and then flash *X*, the inactive slot is the **other** app, so
+you'll **overwrite the other app with X** (ending up with two copies of X). This is
+also what happens if you re-flash from a state you didn't set up.
+
+Two safe ways to update:
+
+- **Foolproof — re-run the 2-flash install above** (CrossInk then MicroSlate). From any
+  state it rewrites one slot with CrossInk and the other with MicroSlate, leaving
+  MicroSlate active. Use this if anything ever looks wrong.
+- **Update one app only** — first **switch to the *other* app** (so the target app's
+  slot becomes the inactive one), *then* flash the target. Example: to update MicroSlate
+  while keeping CrossInk, switch to CrossInk first, then flash `microslate-update.bin`.
 
 ---
 
