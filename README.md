@@ -132,6 +132,19 @@ on the next boot, so the switch survives further reboots and deep-sleep.
 
 ---
 
+## Recovery (if the device gets stuck)
+
+If both slots ever end up holding the same app and the SD-card recovery stops landing
+the other app (it flashes but boots back to the stuck app), the software paths are
+exhausted — there's no USB serial to debug and no in-app way to write firmware. The
+reliable recovery is to overwrite the full flash via an external SPI programmer
+(CH341a + SOIC8 clip), which also swaps in a bootloader with OTA rollback disabled.
+
+Full steps, image layout, and `build-spi-image.sh` are in
+**[`docs/RECOVERY-SPI.md`](docs/RECOVERY-SPI.md)**.
+
+---
+
 ## Credits
 
 - MicroSlate — [`Josh-writes/microslate-firmware`](https://github.com/Josh-writes/microslate-firmware)
