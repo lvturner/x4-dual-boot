@@ -1,0 +1,6 @@
+[submodule "microslate-firmware"]
+	path = microslate-firmware
+	url = https://github.com/lvturner/microslate-firmware
+[submodule "crossink"]
+	path = crossink
+	url = https://github.com/lvturner/CrossInk

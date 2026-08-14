@@ -1,0 +1,3 @@
+# Built firmware images (output of build-both.sh)
+microslate-update.bin
+crossink-update.bin
