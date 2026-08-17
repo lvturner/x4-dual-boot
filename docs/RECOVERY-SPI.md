@@ -35,7 +35,10 @@ directly to the SPI flash chip with an external programmer.
   "CH341a 1.8V/3.3V SPI flasher with SOIC8 clip"). Set its voltage jumper to **3.3 V**.
 - A small Phillips/jeweler's screwdriver, acetone (nail-polish remover), and a thin
   non-conductive prying tool.
-- `flashrom` installed on your PC (`sudo dnf install flashrom` / `apt install flashrom`).
+- `flashrom` — **already built, no install needed**: use
+  `/var/home/lvturner/Documents/Code/x4-spi-tools/flashrom` (v1.8.0-rc1, CH341A-only,
+  built userspace with extracted libusb headers; runs on host and in the container;
+  verified on both). Otherwise `sudo dnf install flashrom` on the host also works.
 
 ### The image
 
@@ -66,16 +69,23 @@ reconnects via a flip ZIF connector, so this is reversible.
 
 ### Read → verify → write
 
-With the clip attached and Reset held:
+With the clip attached and Reset held (run in a **host terminal** — the container
+can't sudo):
 
 ```bash
+FR=/var/home/lvturner/Documents/Code/x4-spi-tools/flashrom   # prebuilt, CH341A-only
+
+# 0. Sanity: chip detected (repeat until it lists the 16 MB flash cleanly)
+sudo $FR --programmer ch341a_spi
+
 # 1. Read the chip TWICE and confirm the hashes match (bad clip = bad data).
-sudo flashrom --programmer ch341a_spi -r read_0.bin
-sudo flashrom --programmer ch341a_spi -r read_1.bin
+#    ARCHIVE read_0.bin — it contains the stock bootloader (unobtainable elsewhere).
+sudo $FR --programmer ch341a_spi -r read_0.bin
+sudo $FR --programmer ch341a_spi -r read_1.bin
 sha256sum read_0.bin read_1.bin     # must be identical
 
 # 2. Write the recovery image.
-sudo flashrom --programmer ch341a_spi -w x4-dualboot-spi-flash.bin
+sudo $FR --programmer ch341a_spi -w x4-dualboot-spi-flash.bin
 # expect: "Verifying flash... VERIFIED."
 ```
 
@@ -84,6 +94,22 @@ sudo flashrom --programmer ch341a_spi -w x4-dualboot-spi-flash.bin
 Disconnect the programmer, remove the clip, release Reset, reinsert the SD card,
 reconnect the screen, apply USB power, hold power ~2 s. **MicroSlate** should boot.
 From MicroSlate, select the **"CrossInk"** entry to verify the dual-boot switch works.
+
+### Re-gluing the screen
+
+- **Best:** thin **double-sided adhesive transfer tape** (3M 468MP / 467MP, or
+  "300LSE"-style film). This is what the factory used: no solvents, no cure time,
+  nothing squeezes into the ZIF connector, and it can be re-opened later with
+  gentle heat/acetone. Cut strips for the screen perimeter only.
+- **Also fine: B-7000 / T-7000** (phone-repair standard): small dots or a thin
+  perimeter bead, kept **well clear of the flex cable and ZIF area**; removable
+  with isopropyl; ~24 h cure before handling, 48 h full strength.
+- **Avoid:** super glue (cyanoacrylate — brittle, wicks, fogs glass, un-reopenable),
+  epoxy, hot glue.
+- Technique: clean all old adhesive off with IPA and let it dry fully; **test-fit
+  the ZIF ribbon and flip the latch before any glue goes down**; lay the screen in
+  from one edge; press with a flat soft object (microfiber-wrapped book) for a
+  minute — never clamp the glass hard.
 
 ## Trade-offs (read before writing)
 
